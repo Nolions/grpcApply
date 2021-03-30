@@ -2,13 +2,18 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"google.golang.org/grpc"
+	config "grpcApply/conf"
 	"grpcApply/protos"
 	"log"
 )
 
 func main() {
-	conn, err := grpc.Dial("localhost:4321", grpc.WithInsecure())
+	config.Load()
+
+	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", config.Conf.Tcp.Address, config.Conf.Tcp.Port), grpc.WithInsecure())
+	log.Printf("Connection to %s:%s", config.Conf.Tcp.Address, config.Conf.Tcp.Port)
 	if err != nil {
 		log.Fatalf("連線失敗：%v", err)
 	}
@@ -18,7 +23,7 @@ func main() {
 	hello(c)
 }
 
-func hello(c protos.EchoClient)  {
+func hello(c protos.EchoClient) {
 	r, err := c.SayHello(context.Background(), &protos.EchoRequest{Message: "HI HI HI HI"})
 	if err != nil {
 		log.Fatalf("無法執行 Plus 函式：%v", err)
